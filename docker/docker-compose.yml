@@ -1,0 +1,52 @@
+version: '3'
+services: 
+    serverlr:
+        image: serverlaravel
+        container_name: serverlr
+        ports:
+            - 8081:80
+            - 4438:443
+        volumes:
+            - ../laravel/:/var/www/html/
+            - ../laravel/:/app
+            - ./virtualhost/000-default.conf:/etc/apache2/sites-available/000-default.conf            
+        links:
+          - servermysql
+          - serveremails
+    servermysql:
+        image: phpmyadmin/phpmyadmin
+        container_name: servermysql
+        restart: always
+        depends_on: 
+            - mysql
+        ports:
+          - 8082:80
+        links: 
+            - mysql:db
+    
+    mysql:
+        image: mysql:5.6
+        container_name: mysql
+        restart: always
+        ports: 
+            - 3306:3306
+        volumes: 
+            - ./mysql:/var/lib/mysql
+        environment: 
+            MYSQL_HOST: 0.0.0.0
+            MYSQL_ROOT_PASSWORD: Nuevo123*
+    
+    gestioncontenedores:        
+        image: portainer/portainer
+        container_name: gestioncontenedores
+        ports:
+            - 9001:9000
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+    serveremails:
+        image: 'eaudeweb/mailtrap'
+        ports: 
+            - 8084:80
+        environment:
+            - MT_USER=admincorreo
+            - MT_PASSWD=Nuevo123*
